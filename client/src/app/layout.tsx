@@ -1,18 +1,18 @@
-import Footer from '@/components/Home/Footer/Footer';
+import Footer from '@/components/global/footer';
 import ResponsiveNav from '@/components/Home/Navbar/ResponsiveNav';
 import { ThemeProvider } from "@/components/theme-provider";
 import { Metadata } from 'next';
-import { Geist, Geist_Mono, Poppins } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+} from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
-const font = Poppins({
-  weight:['100','300','400','500','700','900','200','600','800'],
-  subsets:['latin']
-})
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -31,17 +31,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-b from-black via-gray-900 to-black`}
       >
         <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="sticky top-0 z-50 bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-purple-900/80 backdrop-blur-sm">
             <ResponsiveNav />
-        {children}
-        <Footer />
+          </div>
+          <main className="relative z-10">
+            {children}
+          </main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
