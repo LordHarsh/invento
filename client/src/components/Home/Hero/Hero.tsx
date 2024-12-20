@@ -22,10 +22,14 @@ const Hero = () => {
                     <div className="flex justify-center flex-col w-[90%] sm:w-[80%] h-full mx-auto">
                         <div className="items-center">
                             {/* Text */}
-                            <div className="w-fit py-1.5 px-2 rounded-full shadow-md flex items-center space-x-3 bg-white">
-                                <div className="px-3 py-1 md:px-5 md:py-1 rounded-full bg-purple-700 md:text-base sm:text-sm text-xs text-white">News</div>
-                                <p className="text-xs sm:text-sm text-black"> Our policies are designed to create a safe & fair environment on Invento.</p>
-                            </div>
+                            <div className="w-fit py-1.5 px-2 rounded-full shadow-lg flex items-center space-x-3 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300">
+    <div className="px-3 py-1 md:px-5 md:py-1 rounded-full bg-gradient-to-r from-purple-600 to-purple-800 shadow-sm md:text-base sm:text-sm text-xs text-white/90 backdrop-blur-sm border border-purple-500/30">
+        News
+    </div>
+    <p className="text-xs sm:text-sm text-gray-100">
+        Our policies are designed to create a safe & fair environment on Invento.
+    </p>
+</div>
                             {/* Heading */}
                             <h1
                                 data-aos="fade-up"
