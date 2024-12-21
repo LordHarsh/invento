@@ -1,5 +1,6 @@
-import { ID, Account } from "node-appwrite";
+import { ID, Account, OAuthProvider } from "node-appwrite";
 import { createSessionClient } from "../config";
+// import { headers } from "next/headers";
 
 interface NewUserAccountRequest {
     email: string;
@@ -50,6 +51,39 @@ export class AppwriteAuthService {
             throw {
                 status: 400,
                 message: `Error logging in: ${error}`
+            }
+        }
+    }
+
+    // async sendVerificationEmail() {
+    //     try {
+    //         if (!this.account) {
+    //             await this.initialize();
+    //         }
+    //     } catch (error) {
+    //         throw {
+    //             status: 400,
+    //             message: `Error sending verification email: ${error}`
+    //         }
+    //     }
+    // }
+
+    async createOAuth2Session(provider: OAuthProvider) {
+        try {
+            if (!this.account) {
+                await this.initialize();
+            }
+            const origin = window.location.origin;
+            return await this.account.createOAuth2Token(
+                provider,
+                `http://localhost:3000`,
+                `http://localhost:3000`,
+            );
+        } catch (error) {
+            console.log(error);
+            throw {
+                status: 400,
+                message: `Error creating OAuth2 session: ${error}`
             }
         }
     }
