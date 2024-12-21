@@ -10,10 +10,11 @@ import {
   IconBrandLinkedin,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import appwriteAuthService from "@/appwrite/auth/authService";
 import useAuth from "@/context/useAuth";
 import { OAuthProvider } from "node-appwrite";
+import appwriteAdminAuthService, { createOAuth2Session } from "@/appwrite/auth/adminAuthService";
 
 // Initialize Appwrite Client
 // const client = new Client();
@@ -93,8 +94,10 @@ export default function SignupForm() {
   const handleGoogleLogin = async () => {
     console.log('Google login');
     try {
-      const redirectedUrl = await appwriteAuthService.createOAuth2Session(OAuthProvider.Google);
+      const redirectedUrl = await createOAuth2Session(OAuthProvider.Google);
       console.log(redirectedUrl);
+      // Open redirect URL in window
+      window.open(redirectedUrl, '_self');
     } catch (error) {
       setError((error as Error)?.message || 'An error occurred during signup');
     }

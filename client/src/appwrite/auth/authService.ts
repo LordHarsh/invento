@@ -76,14 +76,28 @@ export class AppwriteAuthService {
             const origin = window.location.origin;
             return await this.account.createOAuth2Token(
                 provider,
-                `http://localhost:3000`,
-                `http://localhost:3000`,
+                `${origin}/oauth`,
+                `${origin}/signup`,
             );
         } catch (error) {
             console.log(error);
             throw {
                 status: 400,
                 message: `Error creating OAuth2 session: ${error}`
+            }
+        }
+    }
+
+    async createSession(userId: string, secret: string) {
+        try {
+            if (!this.account) {
+                await this.initialize();
+            }
+            return await this.account.createSession(userId, secret);
+        } catch (error) {
+            throw {
+                status: 400,
+                message: `Error creating session: ${error}`
             }
         }
     }
