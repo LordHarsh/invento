@@ -1,12 +1,13 @@
+import "@/app/globals.css";
 import Footer from '@/components/global/footer';
-import ResponsiveNav from '@/components/Home/Navbar/ResponsiveNav';
+
 import { ThemeProvider } from "@/components/theme-provider";
+import { Sidebar, SidebarBody, SidebarProvider } from '@/components/ui/sidebar';
 import { Metadata } from 'next';
 import {
   Geist,
   Geist_Mono,
 } from "next/font/google";
-import "@/app/globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,13 +40,30 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+
+          <div className="flex min-h-screen">
+            <SidebarProvider>
+              <div className="sticky top-0 h-screen flex-shrink-0">
+              <Sidebar>
+              <SidebarBody>
+                
+              </SidebarBody>
+              </Sidebar>
+              </div>
+           <div className="flex-grow flex flex-col">
           <div className="sticky top-0 z-50 bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-purple-900/80 backdrop-blur-sm">
-            <ResponsiveNav />
+            {/* <ResponsiveNav /> */}
+            
           </div>
-          <main className="relative z-10">
+          <main className="relative z-10 flex-grow p-5">
+          
             {children}
+            
           </main>
           <Footer />
+          </div>
+          </SidebarProvider>
+          </div>
         </ThemeProvider>
       </body>
     </html>
