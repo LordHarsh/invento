@@ -58,14 +58,14 @@ export default function SignupForm() {
 
     try {
       const userData = await appwriteAuthService.createNewUserAccount({
+        name: `${formData.firstname} ${formData.lastname}`,
         email: formData.email,
         password: formData.password,
-        // name: `${formData.firstname} ${formData.lastname}`
       })
       console.log(userData);
       if (userData) {
         setAuthStatus(true);
-        router.push('/');
+        router.push('/dashboard');
       }
 
 

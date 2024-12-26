@@ -3,6 +3,7 @@ import { createSessionClient } from "../config";
 // import { headers } from "next/headers";
 
 interface NewUserAccountRequest {
+    name: string;
     email: string;
     password: string;
 }
@@ -23,16 +24,16 @@ export class AppwriteAuthService {
         this.account = account;
     }
 
-    async createNewUserAccount({ email, password }: NewUserAccountRequest) {
+    async createNewUserAccount({ name, email, password }: NewUserAccountRequest) {
         try {
             if (!this.account) {
                 await this.initialize();
             }
-            const userAccount = await this.account.create(ID.unique(), email, password);
+            const userAccount = await this.account.create(ID.unique(), email, password, name);
             if (!userAccount) {
                 throw new Error("Failed to create user account");
             }
-            return userAccount;
+            return this.login({ email, password });
         } catch (error) {
             throw {
                 status: 400,

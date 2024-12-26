@@ -43,7 +43,7 @@ export default function LoginForm() {
             });
             if (session) {
                 setAuthStatus(true);
-                router.push('/');
+                router.push('/dashboard');
             }
         } catch (error: unknown) {
             console.error(error);
