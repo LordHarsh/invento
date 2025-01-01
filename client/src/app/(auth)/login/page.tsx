@@ -4,7 +4,7 @@ import React from 'react'
 const SignupPage = () => {
   return (
     <div className="relative h-full py-24">
-        <LoginForm />
+      <LoginForm />
     </div>
   )
 }

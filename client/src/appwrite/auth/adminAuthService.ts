@@ -17,7 +17,7 @@ export async function createOAuth2Session(provider: OAuthProvider) {
         return await account.createOAuth2Token(
             provider,
             `${origin}/oauth`,
-            `${origin}/signup`, 
+            `${origin}/signup`,
         );
     } catch (error) {
         console.log(error);
@@ -40,3 +40,6 @@ export async function getCurrentUser() {
         }
     }
 }
+
+
+// export async function 
