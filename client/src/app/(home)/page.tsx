@@ -1,6 +1,6 @@
 import Home from "@/components/Home/Home";
 
-const HomePage = () => {
+const HomePage = async () => {
   return (
     <div >
       <Home />

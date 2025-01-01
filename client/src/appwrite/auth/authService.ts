@@ -1,148 +1,110 @@
-import { ID, Account, OAuthProvider } from "node-appwrite";
-import { createSessionClient } from "../config";
-// import { headers } from "next/headers";
+"use server"
+import 'server-only';
+import { ID, Permission, Role } from "node-appwrite";
+import { createAdminClient, createSessionClient } from "../config";
+import { cookies } from "next/headers";
+import { appwriteCollections } from "../data/dataService";
+import { getCurrentUserDetails } from "../data/user/userHandler";
 
-interface NewUserAccountRequest {
-    name: string;
-    email: string;
-    password: string;
-}
+
 interface LoginRequest {
     email: string;
     password: string;
 }
 
+// interface OAuth2Session {
+//     provider: OAuthProvider;
+//     code: string;
+//     redirect: string;
+// }
 
-export class AppwriteAuthService {
-    account!: Account;
-    constructor() {
-        this.initialize();
-    }
+interface SignupRequest {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+}
 
-    async initialize() {
+export async function getLoggedInUser() {
+    try {
         const { account } = await createSessionClient();
-        this.account = account;
-    }
-
-    async createNewUserAccount({ name, email, password }: NewUserAccountRequest) {
-        try {
-            if (!this.account) {
-                await this.initialize();
-            }
-            const userAccount = await this.account.create(ID.unique(), email, password, name);
-            if (!userAccount) {
-                throw new Error("Failed to create user account");
-            }
-            return this.login({ email, password });
-        } catch (error) {
-            throw {
-                status: 400,
-                message: `Error creating new user account: ${error}`
-            }
-        }
-    }
-
-    async login({ email, password }: LoginRequest) {
-        try {
-            if (!this.account) {
-                await this.initialize();
-            }
-            return this.account.createEmailPasswordSession(email, password);
-        } catch (error) {
-            throw {
-                status: 400,
-                message: `Error logging in: ${error}`
-            }
-        }
-    }
-
-    // async sendVerificationEmail() {
-    //     try {
-    //         if (!this.account) {
-    //             await this.initialize();
-    //         }
-    //     } catch (error) {
-    //         throw {
-    //             status: 400,
-    //             message: `Error sending verification email: ${error}`
-    //         }
-    //     }
-    // }
-
-    async createOAuth2Session(provider: OAuthProvider) {
-        try {
-            if (!this.account) {
-                await this.initialize();
-            }
-            const origin = window.location.origin;
-            return await this.account.createOAuth2Token(
-                provider,
-                `${origin}/oauth`,
-                `${origin}/signup`,
-            );
-        } catch (error) {
-            console.log(error);
-            throw {
-                status: 400,
-                message: `Error creating OAuth2 session: ${error}`
-            }
-        }
-    }
-
-    async createSession(userId: string, secret: string) {
-        try {
-            if (!this.account) {
-                await this.initialize();
-            }
-            return await this.account.createSession(userId, secret);
-        } catch (error) {
-            throw {
-                status: 400,
-                message: `Error creating session: ${error}`
-            }
-        }
-    }
-
-    async isLoggedIn(): Promise<boolean> {
-        try {
-            if (!this.account) {
-                await this.initialize();
-            }
-            const data = await this.getCurrentUser();
-            return Boolean(data);
-        } catch (error) {
-            throw {
-                status: 400,
-                message: `Error checking if user is logged in: ${error}`
-            }
-        }
-    }
-
-    async getCurrentUser() {
-        try {
-            if (!this.account) {
-                await this.initialize();
-            }
-            return this.account.get();
-        } catch (error) {
-            throw {
-                status: 400,
-                message: `Error getting current user: ${error}`
-            }
-        }
-    }
-
-    async logout() {
-        try {
-            return await this.account.deleteSession("current");
-        } catch (error) {
-            throw {
-                status: 400,
-                message: `Error logging out: ${error}`
-            }
-        }
+        const userAccount = await account.get();
+        const userDetails = await getCurrentUserDetails(userAccount.$id);
+        return {
+            success: true,
+            message: "User details fetched successfully",
+            data: userDetails.data
+        };
+    } catch (error: Error | any) {
+        console.log("Error at authService:", error);
+        return { success: false, message: error };
     }
 }
 
-const appwriteAuthService = new AppwriteAuthService();
-export default appwriteAuthService;
+export async function signup({ firstName, lastName, email, password }: SignupRequest) {
+    try {
+        const { account, database } = await createAdminClient();
+        const name = `${firstName} ${lastName}`;
+        const newUserAccount = await account.create(
+            ID.unique(),
+            email,
+            password,
+            name
+        );
+        if (!newUserAccount) {
+            throw new Error("Failed to create user account");
+        }
+        const { dbId, userCollection } = await appwriteCollections();
+
+        const userCollectionData = await userCollection();
+        const newUserDocument = await database.createDocument(
+            dbId,
+            userCollectionData.$id,
+            ID.unique(),
+            {
+                accountId: newUserAccount.$id,
+                email,
+                firstName,
+                lastName,
+            },
+            [
+                Permission.read(Role.user(newUserAccount.$id)),
+            ]
+        );
+        if (!newUserDocument) {
+            throw new Error("Failed to create user document");
+        }
+        const session = await account.createEmailPasswordSession(email, password);
+
+        (await cookies()).set("invento-session", session.secret, {
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            expires: Date.parse(session.expire),
+        })
+        return { success: true };
+    } catch (error: Error | any) {
+        console.log("Error at authService:", error);
+        console.log(error?.response);
+        return { success: false, message: error?.message, error };
+    }
+}
+
+export const login = async ({ email, password }: LoginRequest) => {
+    try {
+        const { account } = await createAdminClient();
+        const session = await account.createEmailPasswordSession(email, password);
+        (await cookies()).set("invento-session", session.secret, {
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+            expires: Date.parse(session.expire),
+        })
+        return { success: true };
+    } catch (error: Error | any) {
+        console.log("Error at authService:", error);
+        return { success: false, message: error?.message, error };
+    }
+} 

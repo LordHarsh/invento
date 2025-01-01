@@ -1,10 +1,12 @@
-import { Client, Databases, Account, Users } from 'node-appwrite';
+import "server-only";
+import { cookies } from 'next/headers';
+import { Client, Databases, Account } from 'node-appwrite';
 
 const createAdminClient = async () => {
     const client = new Client()
         .setEndpoint(process.env.NEXT_PUBLIC_ENDPOINT || '')
         .setProject(process.env.NEXT_PUBLIC_PROJECT_ID || '')
-        .setKey(process.env.NEXT_PUBLIC_API_KEY || '');
+        .setKey(process.env.NEXT_APPWRITE_KEY || '');
 
     return {
         get account() {
@@ -16,14 +18,17 @@ const createAdminClient = async () => {
     }
 };
 
-const createSessionClient = async (session = null) => {
+const createSessionClient = async () => {
     const client = new Client()
         .setEndpoint(process.env.NEXT_PUBLIC_ENDPOINT || '')
         .setProject(process.env.NEXT_PUBLIC_PROJECT_ID || '')
-
-    if (session) {
-        client.setSession(session);
+    const session = (await cookies()).get("invento-session")
+    if (!session || !session.value) {
+        throw new Error("No session");
     }
+    client.setSession(session.value);
+
+
     return {
         get account() {
             return new Account(client);
@@ -31,10 +36,10 @@ const createSessionClient = async (session = null) => {
         get database() {
             return new Databases(client);
         },
-        get users() {
-            return new Users(client);
-        }
+        // get users() {
+        //     return new Users(client);
+        // }
     }
 };
 
-export { createAdminClient, createSessionClient };
+export { createAdminClient, createSessionClient};

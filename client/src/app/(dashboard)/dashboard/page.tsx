@@ -1,9 +1,13 @@
+'use client';
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';
+// import useAuth from '@/context/useAuth';
 import { IconArrowWaveRightUp, IconBoxAlignRightFilled, IconBoxAlignTopLeft, IconClipboardCopy, IconFileBroken, IconSignature, IconTableColumn } from '@tabler/icons-react';
 
-type Props = {}
+// type Props = {}
 
-const dashboard = (props: Props) => {
+const Dashboard = () => {
+  // const { authStatus } = useAuth();
+  // console.log(authStatus);
   return (
     
 
@@ -71,4 +75,4 @@ const items = [
   },
 ];
 
-export default dashboard
+export default Dashboard

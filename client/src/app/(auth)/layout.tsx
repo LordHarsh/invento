@@ -1,25 +1,10 @@
 "use client";
 import Footer from '@/components/global/footer';
 import ResponsiveNav from '@/components/Home/Navbar/ResponsiveNav';
-import { ThemeProvider } from "@/components/theme-provider";
-import { Metadata } from 'next';
-import {
-  Geist,
-  Geist_Mono,
-} from "next/font/google";
 import "@/app/globals.css";
 import { HeroHighlight } from '@/components/ui/hero-highlight';
 import { motion } from 'framer-motion';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -32,45 +17,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-b from-black via-gray-900 to-black`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
+    <HeroHighlight>
+
+
+      <div className="w-screen sticky top-0 z-50 bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-purple-900/80 backdrop-blur-sm">
+        <ResponsiveNav />
+      </div>
+      <main className="relative z-10">
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: [100, -50, 25, -10, 0],
+          }}
+          transition={{
+            duration: 1.5,
+          }}
+          className=""
         >
-          <HeroHighlight>
 
-
-            <div className="w-screen sticky top-0 z-50 bg-gradient-to-r from-purple-900/80 via-indigo-900/80 to-purple-900/80 backdrop-blur-sm">
-              <ResponsiveNav />
-            </div>
-            <main className="relative z-10">
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  y: 20,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: [100, -50, 25, -10, 0],
-                }}
-                transition={{
-                  duration: 1.5,
-                }}
-                className=""
-              >
-
-                {children}
-              </motion.div>
-            </main>
-            <Footer />
-          </HeroHighlight>
-        </ThemeProvider>
-      </body>
-    </html>
+          {children}
+        </motion.div>
+      </main>
+      <Footer />
+    </HeroHighlight>
   );
 }

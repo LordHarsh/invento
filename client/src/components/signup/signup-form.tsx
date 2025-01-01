@@ -1,5 +1,5 @@
-"use client";
-import React, { useState } from "react";
+"use client"
+import React, { useActionState } from "react";
 // import { Client, Account, ID } from "appwrite";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
@@ -10,109 +10,28 @@ import {
   IconBrandLinkedin,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
-import appwriteAuthService from "@/appwrite/auth/authService";
-import useAuth from "@/context/useAuth";
-import { OAuthProvider } from "node-appwrite";
-import appwriteAdminAuthService, { createOAuth2Session } from "@/appwrite/auth/adminAuthService";
+import { signupAction } from "@/lib/actions/signup";
 
-// Initialize Appwrite Client
-// const client = new Client();
-// client
-//   .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || '')
-//   .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || '');
+const initialState = {
+  success: false,
+  message: '',
+  error: '',
+};
 
 export default function SignupForm() {
-  const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { setAuthStatus } = useAuth();
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
-  };
+  const [state, signupFormAction, pending] = useActionState(signupAction, initialState);
 
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    // Validate form data
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-    console.log(formData);
-
-    try {
-      const userData = await appwriteAuthService.createNewUserAccount({
-        name: `${formData.firstname} ${formData.lastname}`,
-        email: formData.email,
-        password: formData.password,
-      })
-      console.log(userData);
-      if (userData) {
-        setAuthStatus(true);
-        router.push('/dashboard');
-      }
-
-
-    } catch (error: unknown) {
-      console.error(error);
-      setError((error as Error)?.message || 'An error occurred during signup');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Social login handlers
-  // const handleGithubLogin = async () => {
+  // const handleGoogleLogin = async () => {
+  //   console.log('Google login');
   //   try {
-  //     const account = new Account(client);
-  //     await account.createOAuth2Session(
-  //       'github', 
-  //       `${window.location.origin}/dashboard`, 
-  //       `${window.location.origin}/signup`
-  //     );
-  //   } catch (err: any) {
-  //     setError(err.message || 'GitHub login failed');
-  //   }
-  // };
-
-  const handleGoogleLogin = async () => {
-    console.log('Google login');
-    try {
-      const redirectedUrl = await createOAuth2Session(OAuthProvider.Google);
-      console.log(redirectedUrl);
-      // Open redirect URL in window
-      window.open(redirectedUrl, '_self');
-    } catch (error) {
-      setError((error as Error)?.message || 'An error occurred during signup');
-    }
-  };
-
-  // const handleLinkedInLogin = async () => {
-  //   try {
-  //     const account = new Account(client);
-  //     await account.createOAuth2Session(
-  //       'linkedin', 
-  //       `${window.location.origin}/dashboard`, 
-  //       `${window.location.origin}/signup`
-  //     );
-  //   } catch (err: any) {
-  //     setError(err.message || 'LinkedIn login failed');
+  //     const redirectedUrl = await createOAuth2Session(OAuthProvider.Google);
+  //     console.log(redirectedUrl);
+  //     // Open redirect URL in window
+  //     window.open(redirectedUrl, '_self');
+  //   } catch (error) {
+  //     setError((error as Error)?.message || 'An error occurred during signup');
   //   }
   // };
 
@@ -129,33 +48,33 @@ export default function SignupForm() {
         >Login here</Link>
       </p>
 
-      {error && (
+      {typeof state?.error === 'string' && (
         <div className="text-red-500 text-sm mb-4">
-          {error}
+          {state?.error}
         </div>
       )}
 
-      <form className="my-8" onSubmit={handleSubmit}>
+      <form className="my-8" action={signupFormAction}>
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
           <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
+            <Label htmlFor="firstName">First name</Label>
             <Input
-              id="firstname"
+              id="firstName"
               placeholder="Tyler"
               type="text"
-              value={formData.firstname}
-              onChange={handleChange}
+              name="firstName"
+              defaultValue="Tyler"
               required
             />
           </LabelInputContainer>
           <LabelInputContainer>
-            <Label htmlFor="lastname">Last name</Label>
+            <Label htmlFor="lastName">Last name</Label>
             <Input
-              id="lastname"
+              id="lastName"
               placeholder="Durden"
               type="text"
-              value={formData.lastname}
-              onChange={handleChange}
+              name="lastName"
+              defaultValue="Durden"
               required
             />
           </LabelInputContainer>
@@ -166,8 +85,8 @@ export default function SignupForm() {
             id="email"
             placeholder="projectmayhem@fc.com"
             type="email"
-            value={formData.email}
-            onChange={handleChange}
+            name="email"
+            defaultValue="harshbanka3321@gmail.com"
             required
           />
         </LabelInputContainer>
@@ -177,8 +96,8 @@ export default function SignupForm() {
             id="password"
             placeholder="••••••••"
             type="password"
-            value={formData.password}
-            onChange={handleChange}
+            name="password"
+            defaultValue='helloharsh'
             required
           />
         </LabelInputContainer>
@@ -188,8 +107,8 @@ export default function SignupForm() {
             id="confirmPassword"
             placeholder="••••••••"
             type="password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
+            name="confirmPassword"
+            defaultValue='helloharsh'
             required
           />
         </LabelInputContainer>
@@ -197,9 +116,9 @@ export default function SignupForm() {
         <button
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
-          disabled={loading}
+          disabled={pending}
         >
-          {loading ? 'Signing up...' : 'Sign up'} &rarr;
+          {pending ? 'Signing up...' : 'Sign up'} &rarr;
           <BottomGradient />
         </button>
 
@@ -219,7 +138,7 @@ export default function SignupForm() {
           </button>
           <button
             type="button"
-            onClick={handleGoogleLogin}
+            // onClick={handleGoogleLogin}
             className="relative group/btn flex space-x-2 items-center justify-start px-4 w-full text-black rounded-md h-10 font-medium shadow-input bg-gray-50 dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_var(--neutral-800)]"
           >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
