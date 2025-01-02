@@ -1,10 +1,11 @@
-"use client";
+// "use client";
 import { ThemeProvider } from "@/components/theme-provider";
 import {
   Geist,
   Geist_Mono,
 } from "next/font/google";
 import "@/app/globals.css";
+import { Metadata } from "next";
 // import { useState } from 'react';
 // import { AuthProvider } from '@/context/authContext';
 
@@ -18,6 +19,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata: Metadata = {
+  title: "Invento AI",
+  description: "Resume Made Simple",
+};
 
 export default function RootLayout({
   children,
