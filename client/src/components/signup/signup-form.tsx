@@ -63,7 +63,6 @@ export default function SignupForm() {
               placeholder="Tyler"
               type="text"
               name="firstName"
-              defaultValue="Tyler"
               required
             />
           </LabelInputContainer>
@@ -74,7 +73,6 @@ export default function SignupForm() {
               placeholder="Durden"
               type="text"
               name="lastName"
-              defaultValue="Durden"
               required
             />
           </LabelInputContainer>
@@ -86,7 +84,6 @@ export default function SignupForm() {
             placeholder="projectmayhem@fc.com"
             type="email"
             name="email"
-            defaultValue="harshbanka3321@gmail.com"
             required
           />
         </LabelInputContainer>
@@ -97,7 +94,6 @@ export default function SignupForm() {
             placeholder="••••••••"
             type="password"
             name="password"
-            defaultValue='helloharsh'
             required
           />
         </LabelInputContainer>
@@ -108,7 +104,6 @@ export default function SignupForm() {
             placeholder="••••••••"
             type="password"
             name="confirmPassword"
-            defaultValue='helloharsh'
             required
           />
         </LabelInputContainer>
